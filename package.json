@@ -7,11 +7,14 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "format": "prettier --write .",
+    "post-gen": "bun run format && bun run lint && tsc --noEmit 2>&1"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.99.0",
     "@expo/vector-icons": "^15.0.2",
+    "@react-native-async-storage/async-storage": "^3.0.1",
+    "@supabase/supabase-js": "^2.99.0",
     "expo": "~55.0.5",
     "expo-constants": "^55.0.7",
     "expo-linking": "^55.0.7",
