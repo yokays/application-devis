@@ -1,11 +1,24 @@
-# Application Devis
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+- **Validate after every generation:** `bun run post-gen` (runs Prettier → ESLint → TypeScript check)
+- **Format:** `bun run format`
+- **Lint:** `bun run lint`
+- **Type check:** `tsc --noEmit`
+- **Install deps:** `bun install`
+- **Add package:** `bun add <pkg>` (dev: `bun add -d <pkg>`)
+- **Run on device:** `bun expo run:ios --device` (never launch directly — tell user to run it)
 
 ## Stack
 
 - Expo SDK 55 + React Native + TypeScript
 - Expo Router (file-based routing)
-- ESLint + Prettier
-- **Always use `bun`** for installing packages, running scripts, etc. Never npm/yarn.
+- Supabase (auth + backend)
+- ESLint (flat config with eslint-config-expo + eslint-plugin-prettier) + Prettier
+- **Always use `bun`**. Never npm or yarn.
 
 ## Project Structure
 
@@ -44,16 +57,22 @@ docs/                             # Detailed docs (see docs/*.md)
 assets/                           # Images, fonts, icons
 ```
 
+## Architecture
+
+### Auth Flow
+
+`SupabaseProvider` (in root `_layout.tsx`) → creates React context with `{supabase, user, session, isLoading}` → consumed via `useSupabase()` (client) and `useUser()` (user/session/loading). Supabase client is a singleton in `src/services/supabase.ts` using `AsyncStorage` for session persistence. Config comes from `Constants.expoConfig.extra` (set in `app.json` or `app.config.js`).
+
+### Barrel Exports
+
+Every `src/` subdirectory has an `index.ts` barrel. Import from the barrel, not from individual files.
+
 ## Rules
-
-### Package Manager
-
-- **Always use `bun`**: `bun add`, `bun install`, `bun run`. Never npm or yarn.
 
 ### Linting & Validation
 
-- **Run `bun run post-gen` at the end of every generation.** This runs Prettier → ESLint → TypeScript check. Fix all errors before finishing.
-- Single quotes, trailing commas, semicolons (see `.prettierrc`).
+- **Run `bun run post-gen` at the end of every generation.** Fix all errors before finishing.
+- Prettier: single quotes, trailing commas, semicolons, 100 char width (see `.prettierrc`).
 - **Always respect Prettier rules.** Never override or ignore Prettier output.
 
 ### Expo Router — Navigation Best Practices
@@ -166,7 +185,7 @@ assets/                           # Images, fonts, icons
 - Always use `useSupabase()` hook to get the Supabase client.
 - Always use `useUser()` hook to get the current authenticated user, session, and loading state.
 - Both hooks require `SupabaseProvider` in the component tree (already in root layout).
-- **Always use the Une heure revient je. Supabase MCP tools** for database operations (migrations, schema changes, queries, debugging). Never write raw SQL manually when MCP tools can do it.
+- **Always use the Supabase MCP tools** for database operations (migrations, schema changes, queries, debugging). Never write raw SQL manually when MCP tools can do it.
 
 ### Documentation Maintenance (MANDATORY)
 
@@ -177,6 +196,12 @@ assets/                           # Images, fonts, icons
 - **After removing** a file: remove its entry from the tree + `docs/*.md`.
 - Detailed docs live in `docs/`. CLAUDE.md stays as the index.
 - All documentation in English.
+
+### Running the App
+
+- **Never launch the app directly.** Always tell the user to run the command themselves.
+- **Always prefer dev builds** over Expo Go: `bun expo run:ios --device` (user selects their plugged-in device).
+- No Expo Go unless explicitly requested.
 
 ### Language
 
